@@ -36,6 +36,12 @@
   transition: 0.3s ease;
 }
 
+:host-context([data-theme='light']) .skill-pills span {
+  color: rgba(17,24,39,0.8);
+  background: rgba(255,255,255,0.72);
+  border: 1px solid rgba(0,0,0,0.09);
+}
+
 .skill-pills span:hover {
   transform: translateY(-4px);
 
@@ -76,6 +82,10 @@
   font-size: 23px;
 }
 
+:host-context([data-theme='light']) .skill-card h2 {
+  color: #1e1b4b;
+}
+
 .skill-card p {
   margin: 0;
 
@@ -83,6 +93,10 @@
 
   font-size: 15px;
   line-height: 1.7;
+}
+
+:host-context([data-theme='light']) .skill-card p {
+  color: rgba(17,24,39,0.62);
 }
 
 .skill-sphere {

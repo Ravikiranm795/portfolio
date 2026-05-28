@@ -8,6 +8,7 @@ import { ExperienceComponent } from './features/experience/experience.component'
 import { ContactComponent } from './features/contact/contact.component';
 import { ThreeCanvasComponent } from './shared/components/three-canvas/three-canvas.component';
 import { SmoothScrollService } from './core/services/smooth-scroll.service';
+import { ThemeService } from './core/services/theme.service';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { StartupIdeasComponent } from './features/startup-ideas/startup-ideas.component';
@@ -31,9 +32,13 @@ gsap.registerPlugin(ScrollTrigger);
   styleUrl: './app.component.scss',
 })
 export class AppComponent implements OnInit {
-  constructor(private smoothScroll: SmoothScrollService) {}
+  constructor(
+    private smoothScroll: SmoothScrollService,
+    private themeService: ThemeService
+  ) {}
 
   ngOnInit(): void {
+    this.themeService.initializeTheme();
     this.smoothScroll.init();
     setTimeout(() => {
       gsap.utils.toArray('.section-shell, .glass-panel, .project-card, .timeline-card, .idea-card, .skill-card').forEach((section: any) => {

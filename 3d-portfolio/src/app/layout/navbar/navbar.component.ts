@@ -3,6 +3,7 @@ import {
   Component,
   HostListener,
 } from '@angular/core';
+import { ThemeService } from '../../core/services/theme.service';
 
 @Component({
   selector: 'app-navbar',
@@ -11,6 +12,7 @@ import {
   styleUrl: './navbar.component.scss'
 })
 export class NavbarComponent implements AfterViewInit {
+  constructor(private themeService: ThemeService) {}
   activeSection = 'hero';
 
   navItems = [
@@ -53,5 +55,9 @@ export class NavbarComponent implements AfterViewInit {
     if (currentSection) {
       this.activeSection = currentSection.id;
     }
+  }
+
+  toggleTheme(): void {
+    this.themeService.toggleTheme();
   }
 }

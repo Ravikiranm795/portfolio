@@ -43,6 +43,10 @@
   line-height: 1.8;
 }
 
+:host-context([data-theme='light']) .about-card p {
+  color: rgba(17,24,39,0.75);
+}
+
 .card-orbit {
   position: absolute;
   top: -120px;
@@ -79,6 +83,11 @@
   border: 1px solid rgba(255,255,255,0.08);
 }
 
+:host-context([data-theme='light']) .metrics-grid div {
+  background: rgba(255,255,255,0.72);
+  border: 1px solid rgba(0,0,0,0.08);
+}
+
 .metrics-grid strong {
   display: block;
 
@@ -90,11 +99,19 @@
   line-height: 1;
 }
 
+:host-context([data-theme='light']) .metrics-grid strong {
+  color: #7c3aed;
+}
+
 .metrics-grid span {
   color: rgba(255,255,255,0.62);
 
   font-size: 14px;
   line-height: 1.5;
+}
+
+:host-context([data-theme='light']) .metrics-grid span {
+  color: rgba(17,24,39,0.62);
 }
 
 @media (max-width: 960px) {

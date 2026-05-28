@@ -58,6 +58,10 @@ h2 {
   line-height: 1.25;
 }
 
+:host-context([data-theme='light']) h2 {
+  color: #1e1b4b;
+}
+
 p {
   margin: 0;
 
@@ -65,6 +69,10 @@ p {
 
   font-size: 14px;
   line-height: 1.65;
+}
+
+:host-context([data-theme='light']) p {
+  color: rgba(17,24,39,0.6);
 }
 
 @media (max-width: 1180px) {

@@ -81,12 +81,20 @@ h2 {
   font-size: 28px;
 }
 
+:host-context([data-theme='light']) h2 {
+  color: #1e1b4b;
+}
+
 p {
   margin: 0;
 
   color: rgba(255,255,255,0.62);
 
   line-height: 1.7;
+}
+
+:host-context([data-theme='light']) p {
+  color: rgba(17,24,39,0.62);
 }
 
 .project-actions {
@@ -107,6 +115,12 @@ p {
   background: rgba(255,255,255,0.05);
 
   border: 1px solid rgba(255,255,255,0.09);
+}
+
+:host-context([data-theme='light']) .project-actions a {
+  color: #1e1b4b;
+  background: rgba(255,255,255,0.72);
+  border: 1px solid rgba(0,0,0,0.1);
 }
 
 @media (max-width: 1100px) {

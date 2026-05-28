@@ -1,285 +1,121 @@
 import { Injectable, NgZone } from '@angular/core';
-import gsap from 'gsap';
 import * as THREE from 'three';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
-
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
-
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
-gsap.registerPlugin(ScrollTrigger);
-@Injectable({
-  providedIn: 'root',
-})
+import { SceneManagerService } from './scene-manager.service';
+
+@Injectable({ providedIn: 'root' })
 export class ThreeEngineService {
-  scene!: THREE.Scene;
+
   camera!: THREE.PerspectiveCamera;
   renderer!: THREE.WebGLRenderer;
   composer!: EffectComposer;
-  private animationFrameId = 0;
 
-  constructor(private ngZone: NgZone) {}
+  // mouse target in world units
+  private targetX = 0;
+  private targetY = 0;
+
+  // scroll warp
+  private lastScrollY    = 0;
+  private scrollVelocity = 0;
+  private warpMultiplier = 1;
+
+  constructor(
+    private ngZone: NgZone,
+    private sceneManager: SceneManagerService
+  ) {}
 
   init(canvas: HTMLCanvasElement): void {
     this.ngZone.runOutsideAngular(() => {
-      this.createScene();
+      this.sceneManager.initializeScenes();
       this.createCamera();
       this.createRenderer(canvas);
+      this.sceneManager.setRenderer(this.renderer);
       this.setupPostProcessing();
-      this.createLights();
-      this.createObjects();
-      this.setupScrollAnimations();
+      this.setupScrollWarp();
+      this.setupMouseTracking();
       this.animate();
-
       window.addEventListener('resize', () => this.onResize());
-
-      window.addEventListener('mousemove', (event) => {
-        const x = (event.clientX / window.innerWidth - 0.5) * 2;
-
-        const y = (event.clientY / window.innerHeight - 0.5) * 2;
-
-        gsap.to(this.camera.position, {
-          x: x * 0.5,
-          y: -y * 0.5,
-          duration: 1.2,
-          ease: 'power3.out',
-        });
-      });
     });
-  }
-
-  private createScene(): void {
-    this.scene = new THREE.Scene();
-
-    this.scene.background = null;
-
-    this.scene.fog = new THREE.Fog('#020617', 8, 24);
   }
 
   private createCamera(): void {
     this.camera = new THREE.PerspectiveCamera(
-      75,
+      70,
       window.innerWidth / window.innerHeight,
       0.1,
-      1000
+      500
     );
-
-    this.camera.position.set(0, 0, 6);
+    this.camera.position.set(0, 0, 9);
   }
 
   private createRenderer(canvas: HTMLCanvasElement): void {
-    this.renderer = new THREE.WebGLRenderer({
-      canvas,
-      antialias: true,
-      alpha: true,
-    });
-
+    this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
     this.renderer.setSize(window.innerWidth, window.innerHeight);
-
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
-
-    this.renderer.setClearColor(0x020617, 0);
-
-    this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-
-    this.renderer.toneMappingExposure = 1.05;
+    this.renderer.setClearColor('#00000a', 1);
   }
 
-  private createLights(): void {
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.65);
+  private setupPostProcessing(): void {
+    const scene = this.sceneManager.getActiveScene();
+    this.composer = new EffectComposer(this.renderer);
+    this.composer.addPass(new RenderPass(scene, this.camera));
 
-    this.scene.add(ambientLight);
-
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 1.8);
-
-    directionalLight.position.set(5, 5, 5);
-
-    this.scene.add(directionalLight);
-    const purpleLight = new THREE.PointLight('#a855f7', 4.5, 20);
-
-    purpleLight.position.set(2.2, 1.8, 3.2);
-
-    this.scene.add(purpleLight);
-
-    const blueLight = new THREE.PointLight('#0ea5e9', 4, 18);
-
-    blueLight.position.set(4.8, -0.2, 2);
-
-    this.scene.add(blueLight);
+    const bloom = new UnrealBloomPass(
+      new THREE.Vector2(window.innerWidth, window.innerHeight),
+      1.2,   // strength
+      0.55,  // radius
+      0.75   // threshold
+    );
+    this.composer.addPass(bloom);
   }
 
-  private createObjects(): void {
-    const geometry = new THREE.TorusKnotGeometry(1, 0.3, 100, 16);
+  private setupScrollWarp(): void {
+    window.addEventListener('scroll', () => {
+      const current = window.scrollY;
+      this.scrollVelocity = Math.abs(current - this.lastScrollY);
+      this.lastScrollY    = current;
+    }, { passive: true });
+  }
 
-    const material = new THREE.MeshPhysicalMaterial({
-      color: '#6d28d9',
+  private setupMouseTracking(): void {
+    window.addEventListener('mousemove', (e) => {
+      // wider range — camera moves ±2.8 on X, ±1.8 on Y
+      this.targetX = ((e.clientX / window.innerWidth)  - 0.5) * 5.6;
+      this.targetY = ((e.clientY / window.innerHeight) - 0.5) * -3.6;
 
-      metalness: 0.9,
-
-      roughness: 0.15,
-
-      clearcoat: 1,
-
-      clearcoatRoughness: 0.1,
-
-      emissive: '#312e81',
-
-      emissiveIntensity: 0.4,
-    });
-
-    const mesh = new THREE.Mesh(geometry, material);
-
-    mesh.scale.set(0.94, 0.94, 0.94);
-
-    mesh.position.set(2.25, 0.12, 0);
-
-    mesh.name = 'main-object';
-
-    this.scene.add(mesh);
-
-    const ringGeometry = new THREE.TorusGeometry(2.2, 0.006, 16, 200);
-
-    const ringMaterial = new THREE.MeshPhysicalMaterial({
-      color: '#8b5cf6',
-      transparent: true,
-      opacity: 0.4,
-      emissive: '#8b5cf6',
-      emissiveIntensity: 0.3,
-    });
-
-    const ring = new THREE.Mesh(ringGeometry, ringMaterial);
-
-    ring.rotation.x = 1.15;
-
-    ring.position.set(2.25, 0.12, 0);
-
-    ring.name = 'orbit-ring';
-
-    this.scene.add(ring);
-
-    const particlesGeometry = new THREE.BufferGeometry();
-
-    const particlesCount = 1200;
-
-    const posArray = new Float32Array(particlesCount * 3);
-
-    for (let i = 0; i < particlesCount * 3; i++) {
-      posArray[i] = (Math.random() - 0.5) * 20;
-    }
-
-    particlesGeometry.setAttribute(
-      'position',
-      new THREE.BufferAttribute(posArray, 3)
-    );
-
-    const particlesMaterial = new THREE.PointsMaterial({
-      size: 0.003,
-      color: '#8b5cf6',
-      transparent: true,
-      opacity: 0.25,
-    });
-
-    const particlesMesh = new THREE.Points(
-      particlesGeometry,
-      particlesMaterial
-    );
-
-    particlesMesh.name = 'particles';
-
-    this.scene.add(particlesMesh);
-
-    const platformGeometry = new THREE.CylinderGeometry(1.45, 2.25, 0.34, 96);
-
-    const platformMaterial = new THREE.MeshPhysicalMaterial({
-      color: '#0b1025',
-      metalness: 0.35,
-      roughness: 0.48,
-      clearcoat: 0.5,
-      emissive: '#1d0f3f',
-      emissiveIntensity: 0.24,
-    });
-
-    const platform = new THREE.Mesh(platformGeometry, platformMaterial);
-
-    platform.position.set(2.25, -1.48, -0.32);
-
-    platform.scale.set(1.3, 0.5, 0.36);
-
-    platform.name = 'hero-platform';
-
-    this.scene.add(platform);
-
-    const accentMaterial = new THREE.MeshPhysicalMaterial({
-      color: '#2563eb',
-      metalness: 0.55,
-      roughness: 0.28,
-      clearcoat: 1,
-      emissive: '#0f172a',
-      emissiveIntensity: 0.35,
-    });
-
-    [
-      { position: [3.55, 1.9, -0.8], scale: 0.26 },
-      { position: [4.55, -0.2, -0.4], scale: 0.22 },
-      { position: [1.05, -0.5, -1.1], scale: 0.07 },
-    ].forEach((accent, index) => {
-      const orb = new THREE.Mesh(
-        new THREE.SphereGeometry(accent.scale, 32, 32),
-        accentMaterial
-      );
-
-      orb.position.set(
-        accent.position[0],
-        accent.position[1],
-        accent.position[2]
-      );
-
-      orb.name = `accent-orb-${index}`;
-
-      this.scene.add(orb);
+      this.sceneManager.mouseX = (e.clientX / window.innerWidth)  - 0.5;
+      this.sceneManager.mouseY = (e.clientY / window.innerHeight) - 0.5;
     });
   }
 
   private animate(): void {
     const clock = new THREE.Clock();
+    let prev = 0;
 
     const tick = () => {
-      const elapsedTime = clock.getElapsedTime();
+      const elapsed = clock.getElapsedTime();
+      const delta   = elapsed - prev;
+      prev = elapsed;
 
-      const object = this.scene.getObjectByName('main-object');
+      // scroll → warp multiplier: idle=1, max ~20 on fast scroll
+      this.warpMultiplier += (1 + Math.min(this.scrollVelocity * 0.7, 19) - this.warpMultiplier) * 0.07;
+      this.scrollVelocity *= 0.80;
+      this.sceneManager.setWarpSpeed(this.warpMultiplier);
 
-      if (object) {
-        object.rotation.x += 0.003;
-        object.rotation.y += 0.005;
+      this.sceneManager.tick(elapsed, delta);
 
-        object.position.y = 0.12 + Math.sin(elapsedTime) * 0.12;
-      }
+      // camera smoothly chases mouse with stronger lerp for snappier feel
+      this.camera.position.x += (this.targetX - this.camera.position.x) * 0.055;
+      this.camera.position.y += (this.targetY + Math.sin(elapsed * 0.18) * 0.12 - this.camera.position.y) * 0.055;
 
-      const particles = this.scene.getObjectByName('particles');
-
-      if (particles) {
-        particles.rotation.y = elapsedTime * 0.02;
-      }
-
-      const ring = this.scene.getObjectByName('orbit-ring');
-
-      if (ring) {
-        ring.position.y = 0.12 + Math.sin(elapsedTime) * 0.12;
-        ring.rotation.z += 0.002;
-      }
-
-      this.scene.children.forEach((child, index) => {
-        if (child.name.includes('accent-orb')) {
-          child.position.y += Math.sin(elapsedTime + index) * 0.0008;
-          child.rotation.y += 0.004;
-        }
-      });
+      // look at a point slightly in front so angle changes are visible
+      this.camera.lookAt(0, 0, -8);
 
       this.composer.render();
-
-      this.animationFrameId = requestAnimationFrame(tick);
+      requestAnimationFrame(tick);
     };
 
     tick();
@@ -287,98 +123,9 @@ export class ThreeEngineService {
 
   private onResize(): void {
     this.camera.aspect = window.innerWidth / window.innerHeight;
-
     this.camera.updateProjectionMatrix();
-
     this.renderer.setSize(window.innerWidth, window.innerHeight);
-
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     this.composer.setSize(window.innerWidth, window.innerHeight);
-  }
-
-  private setupScrollAnimations(): void {
-    const object = this.scene.getObjectByName('main-object');
-
-    if (!object) return;
-
-    gsap.to(this.camera.position, {
-      z: 3,
-
-      scrollTrigger: {
-        trigger: '#hero',
-        start: 'top top',
-        end: 'bottom top',
-        scrub: true,
-      },
-    });
-
-    gsap.to(object.rotation, {
-      x: Math.PI * 2,
-      y: Math.PI * 2,
-
-      scrollTrigger: {
-        trigger: '#about',
-        start: 'top center',
-        end: 'bottom center',
-        scrub: true,
-      },
-    });
-
-    gsap.to(this.camera.position, {
-      x: 2,
-      y: 1,
-      z: 4,
-
-      scrollTrigger: {
-        trigger: '#skills',
-        start: 'top center',
-        end: 'bottom center',
-        scrub: true,
-      },
-    });
-
-    gsap.to(object.position, {
-      x: -2,
-      y: 1,
-
-      scrollTrigger: {
-        trigger: '#projects',
-        start: 'top center',
-        end: 'bottom center',
-        scrub: true,
-      },
-    });
-
-    gsap.to(this.camera.position, {
-      x: 0,
-      y: 0,
-      z: 7,
-
-      scrollTrigger: {
-        trigger: '#contact',
-        start: 'top center',
-        end: 'bottom center',
-        scrub: true,
-      },
-    });
-  }
-  private setupPostProcessing(): void {
-    this.composer = new EffectComposer(this.renderer);
-
-    const renderPass = new RenderPass(this.scene, this.camera);
-
-    this.composer.addPass(renderPass);
-
-    const bloomPass = new UnrealBloomPass(
-      new THREE.Vector2(
-        window.innerWidth,
-        window.innerHeight
-      ),
-      0.45,
-      0.6,
-      0.85
-    );
-
-    this.composer.addPass(bloomPass);
   }
 }

@@ -4,35 +4,50 @@
 
 html,
 body {
-  margin: 0;
-  padding: 0;
+  overflow-x: hidden;
+}
+
+html[data-theme='dark'],
+body[data-theme='dark'] {
   background:
     radial-gradient(
-      circle at 58% 50%,
-      rgba(37,99,235,0.18),
-      transparent 24%
-    ),
-    radial-gradient(
-      circle at 62% 68%,
-      rgba(124,58,237,0.2),
-      transparent 28%
-    ),
-    radial-gradient(
       circle at top,
-      rgba(76,29,149,0.2),
+      rgba(76,29,149,0.12),
+      transparent 22%
+    ),
+    radial-gradient(
+      circle at bottom right,
+      rgba(37,99,235,0.08),
       transparent 30%
     ),
     #020617;
-  color: white;
-  overflow-x: hidden;
-  font-family:
-    Inter,
-    ui-sans-serif,
-    system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    sans-serif;
+}
+
+html[data-theme='light'],
+body[data-theme='light'] {
+  background:
+    radial-gradient(
+      ellipse at 70% 10%,
+      rgba(255, 200, 40, 0.9),
+      transparent 45%
+    ),
+    radial-gradient(
+      ellipse at 30% 60%,
+      rgba(255, 100, 0, 0.75),
+      transparent 50%
+    ),
+    radial-gradient(
+      ellipse at 80% 80%,
+      rgba(200, 50, 0, 0.5),
+      transparent 40%
+    ),
+    linear-gradient(
+      150deg,
+      #1a0500 0%,
+      #2a0a00 40%,
+      #180800 100%
+    );
+  color: #e8edf5;
 }
 
 body {
@@ -125,6 +140,12 @@ a {
   -webkit-text-fill-color: transparent;
 }
 
+[data-theme='light'] .section-heading {
+  background: linear-gradient(90deg, #1e1b4b, #7c3aed 60%, #2563eb);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
 .section-copy {
   max-width: 720px;
 
@@ -133,6 +154,10 @@ a {
   color: rgba(255,255,255,0.66);
 
   line-height: 1.8;
+}
+
+[data-theme='light'] .section-copy {
+  color: rgba(17,24,39,0.72);
 }
 
 .glass-panel {
@@ -152,19 +177,23 @@ a {
   backdrop-filter: blur(20px);
 }
 
-.section::before {
-  content: '';
-
-  position: absolute;
-  inset: 0;
-
-  z-index: 0;
-
-  pointer-events: none;
+[data-theme='light'] .glass-panel {
+  border: 1px solid rgba(0,0,0,0.08);
 
   background:
-    radial-gradient(circle at 20% 20%, rgba(124,58,237,0.08), transparent 24%),
-    radial-gradient(circle at 80% 70%, rgba(37,99,235,0.08), transparent 26%);
+    linear-gradient(
+      145deg,
+      rgba(255,255,255,0.72),
+      rgba(255,255,255,0.42)
+    );
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.9),
+    0 30px 90px rgba(37,99,235,0.08);
+}
+
+.section::before {
+  display: none;
 }
 
 @media (max-width: 760px) {

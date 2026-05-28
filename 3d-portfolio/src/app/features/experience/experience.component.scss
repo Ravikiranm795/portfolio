@@ -69,6 +69,11 @@
   box-shadow: 0 0 34px rgba(124,58,237,0.28);
 }
 
+:host-context([data-theme='light']) .timeline-index {
+  color: #7c3aed;
+  background: #f0ebff;
+}
+
 .period {
   color: #60a5fa;
 
@@ -86,6 +91,10 @@ h2 {
   font-size: clamp(28px, 4vw, 44px);
 }
 
+:host-context([data-theme='light']) h2 {
+  color: #1e1b4b;
+}
+
 h3 {
   margin: 0 0 18px;
 
@@ -95,12 +104,20 @@ h3 {
   font-weight: 500;
 }
 
+:host-context([data-theme='light']) h3 {
+  color: rgba(17,24,39,0.65);
+}
+
 p {
   margin: 0;
 
   color: rgba(255,255,255,0.62);
 
   line-height: 1.75;
+}
+
+:host-context([data-theme='light']) p {
+  color: rgba(17,24,39,0.62);
 }
 
 @media (max-width: 720px) {
