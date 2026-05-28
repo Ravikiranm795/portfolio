@@ -1,0 +1,27 @@
+<header class="navbar">
+  <div class="logo">
+    RM.
+  </div>
+
+  <nav>
+    @for (item of navItems; track item.id) {
+      <a
+        [href]="'#' + item.id"
+        [class.active]="activeSection === item.id"
+        (click)="setActiveSection(item.id)">
+        {{ item.label }}
+      </a>
+    }
+  </nav>
+
+  <div class="nav-actions">
+    <button class="resume-btn">
+      <span class="download-icon">↓</span>
+      Download Resume
+    </button>
+
+    <button class="theme-btn" aria-label="Toggle theme">
+      ◐
+    </button>
+  </div>
+</header>

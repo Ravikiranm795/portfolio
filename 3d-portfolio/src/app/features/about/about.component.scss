@@ -1,0 +1,109 @@
+.about-section {
+  min-height: 92vh;
+}
+
+.about-shell {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 64px;
+  align-items: center;
+}
+
+.about-card {
+  position: relative;
+
+  overflow: hidden;
+
+  padding: 52px;
+
+  border-radius: 28px;
+}
+
+.about-card::before {
+  content: '';
+
+  position: absolute;
+  inset: -1px;
+
+  pointer-events: none;
+
+  background:
+    radial-gradient(circle at 18% 18%, rgba(168,85,247,0.2), transparent 28%),
+    radial-gradient(circle at 80% 76%, rgba(37,99,235,0.18), transparent 30%);
+}
+
+.about-card p {
+  position: relative;
+
+  margin: 0;
+
+  color: rgba(255,255,255,0.78);
+
+  font-size: 22px;
+  line-height: 1.8;
+}
+
+.card-orbit {
+  position: absolute;
+  top: -120px;
+  right: -90px;
+
+  width: 300px;
+  height: 300px;
+
+  border: 1px solid rgba(168,85,247,0.28);
+  border-radius: 50%;
+
+  transform: rotate(-22deg);
+}
+
+.metrics-grid {
+  position: relative;
+
+  margin-top: 44px;
+
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.metrics-grid div {
+  min-height: 128px;
+
+  padding: 22px;
+
+  border-radius: 18px;
+
+  background: rgba(2,6,23,0.42);
+
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.metrics-grid strong {
+  display: block;
+
+  margin-bottom: 12px;
+
+  color: #c4b5fd;
+
+  font-size: 36px;
+  line-height: 1;
+}
+
+.metrics-grid span {
+  color: rgba(255,255,255,0.62);
+
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+@media (max-width: 960px) {
+  .about-shell,
+  .metrics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .about-card {
+    padding: 32px;
+  }
+}

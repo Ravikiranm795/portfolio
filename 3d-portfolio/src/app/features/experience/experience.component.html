@@ -1,0 +1,26 @@
+<section id="experience" class="section experience-section">
+  <div class="section-shell">
+    <span class="section-kicker">Experience</span>
+
+    <h1 class="section-heading">
+      Enterprise engineering with product-grade execution.
+    </h1>
+
+    <div class="timeline">
+      @for (item of experience; track item.company; let index = $index) {
+        <article class="timeline-card glass-panel">
+          <div class="timeline-index">
+            0{{ index + 1 }}
+          </div>
+
+          <div>
+            <span class="period">{{ item.period }}</span>
+            <h2>{{ item.company }}</h2>
+            <h3>{{ item.role }}</h3>
+            <p>{{ item.description }}</p>
+          </div>
+        </article>
+      }
+    </div>
+  </div>
+</section>

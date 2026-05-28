@@ -1,0 +1,22 @@
+<section id="startup-ideas" class="section startup-section">
+  <div class="section-shell">
+    <span class="section-kicker">AI Concepts</span>
+
+    <h1 class="section-heading">
+      Startup-grade ideas for intelligent operational platforms.
+    </h1>
+
+    <div class="ideas-grid">
+      @for (idea of ideas; track idea; let index = $index) {
+        <article class="idea-card glass-panel">
+          <span class="idea-number">0{{ index + 1 }}</span>
+          <h2>{{ idea }}</h2>
+          <p>
+            A product concept designed around automation, compliance, insight,
+            and measurable workflow acceleration.
+          </p>
+        </article>
+      }
+    </div>
+  </div>
+</section>

@@ -1,0 +1,27 @@
+<section id="skills" class="section skills-section">
+  <div class="section-shell">
+    <span class="section-kicker">Capabilities</span>
+
+    <h1 class="section-heading">
+      A technical stack built for immersive product interfaces.
+    </h1>
+
+    <div class="skills-layout">
+      <div class="skill-pills glass-panel">
+        @for (skill of skills; track skill) {
+          <span>{{ skill }}</span>
+        }
+      </div>
+
+      <div class="pillar-grid">
+        @for (pillar of pillars; track pillar.title) {
+          <article class="skill-card glass-panel">
+            <div class="skill-sphere"></div>
+            <h2>{{ pillar.title }}</h2>
+            <p>{{ pillar.copy }}</p>
+          </article>
+        }
+      </div>
+    </div>
+  </div>
+</section>

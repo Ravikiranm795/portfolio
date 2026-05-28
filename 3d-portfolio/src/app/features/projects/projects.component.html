@@ -1,0 +1,30 @@
+<section id="projects" class="section projects-section">
+  <div class="section-shell">
+    <span class="section-kicker">Showcase</span>
+
+    <h1 class="section-heading">
+      Selected builds shaped like premium digital products.
+    </h1>
+
+    <div class="projects-grid">
+      @for (project of projects; track project.title) {
+        <article class="project-card glass-panel">
+          <div class="project-visual">
+            <span></span>
+          </div>
+
+          <div class="project-content">
+            <span class="tech">{{ project.tech }}</span>
+            <h2>{{ project.title }}</h2>
+            <p>{{ project.description }}</p>
+
+            <div class="project-actions">
+              <a [href]="project.github">GitHub</a>
+              <a [href]="project.live">Live Demo</a>
+            </div>
+          </div>
+        </article>
+      }
+    </div>
+  </div>
+</section>
